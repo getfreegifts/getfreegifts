@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spin and Win</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff5722, #e91e63, #9c27b0, #673ab7, #3f51b5, #2196f3, #03a9f4, #00bcd4);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        /* Improved Spinner Styles */
+        .spinner-container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            margin: 0 auto 30px;
+        }
+        
+        .wheel-outer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            background: #fff;
+            overflow: hidden;
+        }
+        
+        .wheel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: transform 4s cubic-bezier(0.22, 1, 0.36, 1);
+            transform-origin: center;
+            overflow: hidden;
+        }
+        
+        /* SVG-based wheel implementation for perfect circles */
+        .wheel-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Prize items container - new approach */
+        .prize-items-container {
+      position: absolute;
+    top: 20px;
+    left: 23px;
+    width: 330px !important;
+    height: 330px !important;
+        }
+        
+        /* Improved prize item positioning */
+        .prize-item {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-origin: center;
+            z-index: 5;
+            transition: all 0.3s ease;
+            top: 114px;
+            left: 129px;
+        }
+        
+        .prize-item img {
+            width: 40px;
+            height: 40px;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+            transition: all 0.3s ease;
+        }
+        
+        .prize-text {
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+            margin-top: 5px;
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            padding: 2px 6px;
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(255,255,255,0.2);
+            white-space: nowrap;
+        }
+        
+        .wheel-center {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #ff5722, #e64a19);
+            border-radius: 50%;
+            top: 38%;
+            left: 38%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 6px solid white;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .wheel-center::after {
+            content: '';
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .spinner-arrow {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            z-index: 12;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+        }
+        
+        .spinner-arrow::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #d32f2f, #f44336);
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+        }
+        
+        /* Button Styles */
+        .btn {
+            background: linear-gradient(45deg, #ff5722, #e64a19);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 18px 35px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255, 87, 34, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(45deg, #e64a19, #d84315);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 87, 34, 0.5);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn:disabled {
+            background: linear-gradient(45deg, #ccc, #999);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:disabled::before {
+            display: none;
+        }
+        
+        .btn.spinning {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            animation: pulse 0.5s infinite;
+        }
+        
+        /* Prize Display */
+        .prize-display {
+            display: none;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin: 20px 0;
+        }
+        
+        .prize-display h2 {
+            color: #ff5722;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .prize-image {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            object-fit: contain;
+        }
+        
+        /* Links Section */
+        .links-section {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .floating-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            max-width: 480px;
+            width: 92%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .prize-image {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .floating-card::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .floating-card::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .floating-card::-webkit-scrollbar-thumb {
+            background: #ff5722;
+            border-radius: 4px;
+        }
+        
+        .floating-card::-webkit-scrollbar-thumb:hover {
+            background: #e64a19;
+        }
+        
+        .floating-card-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .floating-card h3 {
+            color: #2e4057;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            text-align: center;
+            font-weight: 800;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff5722, #e64a19);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 5px;
+        }
+        
+        .link-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 14px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: 2px solid transparent;
+        }
+        
+        .link-item:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .link-item.completed {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+        }
+        
+        .link-title {
+            font-weight: bold;
+            color: #2e4057;
+            display: flex;
+            align-items: center;
+        }
+        
+        .link-title::before {
+            content: '🔗';
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .link-item.completed .link-title::before {
+            content: '✅';
+        }
+        
+        .link-status {
+            color: #6c757d;
+            font-size: 0.9rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background-color: rgba(108, 117, 125, 0.1);
+        }
+        
+        .link-status.completed {
+            color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        
+        /* Claim Form */
+        .claim-form {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2e4057;
+            text-align: left;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            border-color: #ff5722;
+            outline: none;
+        }
+        
+        /* Success Message */
+        .success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        /* Loader */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .loader {
+            width: 70px;
+            height: 70px;
+            border: 8px solid rgba(255, 87, 34, 0.2);
+            border-top: 8px solid #ff5722;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        .loader-text {
+            color: #2e4057;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translate(-50%, -40%); }
+            100% { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes highlight {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+            100% { filter: brightness(1); }
+        }
+        /* create variable */
+        :root {
+            --translateY: -120px;
+        }
+        /* Responsive Styles */
+         @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+/*             
+            .spinner-container {
+                width: 300px;
+                height: 300px;
+            }
+             */
+            .wheel-center {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .wheel-center::after {
+                width: 30px;
+                height: 30px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .floating-card {
+                padding: 25px;
+            }
+        }
+          @media (max-width: 480px) {
+            .spinner-container {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .prize-items-container {
+                width: 260px !important;
+                height: 260px !important;
+                top: 15px;
+                left: 24px;
+            }
+
+            .prize-item {
+                width: 45px;
+                height: 45px;
+                top: 90px;
+                left: 95px;
+            }
+            
+            .prize-item img {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .prize-text {
+                font-size: 11px;
+                padding: 3px 6px;
+                white-space: nowrap;
+                margin-top: 3px;
+            }
+            
+            .wheel-center {
+                width: 65px;
+                height: 65px;
+                top: 39%;
+                left: 39%;
+            }
+            
+            .wheel-center::after {
+                width: 28px;
+                height: 28px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 10px;
+            }
+            
+            .btn {
+                padding: 14px 28px;
+                font-size: 1.1rem;
+                margin: 15px 0;
+            }
+            
+            .floating-card {
+                padding: 25px;
+                width: 95%;
+            }
+
+            .prize-item {
+                --translateY: -100px;
+            }
+          
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading overlay -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader"></div>
+        <div class="loader-text">Loading your chance to win...</div>
+    </div>
+
+    <div class="container">
+        <h1>Spin the Wheel & Win Amazing Prizes!</h1>
+        <p>Try your luck today! Spin the wheel for a chance to win an iPhone, cash, and other exciting gifts.</p>
+        
+        <!-- Spinner -->
+        <div class="spinner-container">
+            <div class="spinner-arrow"></div>
+            <div class="wheel-outer">
+                <div class="wheel" id="wheel">
+                    <svg class="wheel-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Wheel Sections - Exactly 8 sections with enhanced gradients -->
+                        <defs>
+                            <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style="stop-color:#ff7043;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ff5722;stop-opacity:1" />
+                            </radialGradient>
+                            <radialGradient id="grad2" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style="stop-color:#f06292;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#e91e63;stop-opacity:1" />
+                            </radialGradient>
+                            <radialGradient id="grad3" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style="stop-color:#ab47bc;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#9c27b0;stop-opacity:1" />
+                            </radialGradient>
+                            <radialGradient id="grad4" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style="stop-color:#7e57c2;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#673ab7;stop-opacity:1" />
+                            </radialGradient>
+                            <radialGradient id="grad5" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style="stop-color:#5c6bc0;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#3f51b5;stop-opacity:1" />
+                            </radialGradient>
+                            <radialGradient id="grad6" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style="stop-color:#42a5f5;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#2196f3;stop-opacity:1" />
+                            </radialGradient>
+                            <radialGradient id="grad7" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style="stop-color:#29b6f6;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#03a9f4;stop-opacity:1" />
+                            </radialGradient>
+                            <radialGradient id="grad8" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style="stop-color:#26c6da;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#00bcd4;stop-opacity:1" />
+                            </radialGradient>
+                        </defs>
+                        
+                        <!-- Wheel Sections with gradients -->
+                        <path d="M50,50 L100,50 A50,50 0 0,0 85.36,14.64 Z" fill="url(#grad1)" />
+                        <path d="M50,50 L85.36,14.64 A50,50 0 0,0 50,0 Z" fill="url(#grad2)" />
+                        <path d="M50,50 L50,0 A50,50 0 0,0 14.64,14.64 Z" fill="url(#grad3)" />
+                        <path d="M50,50 L14.64,14.64 A50,50 0 0,0 0,50 Z" fill="url(#grad4)" />
+                        <path d="M50,50 L0,50 A50,50 0 0,0 14.64,85.36 Z" fill="url(#grad5)" />
+                        <path d="M50,50 L14.64,85.36 A50,50 0 0,0 50,100 Z" fill="url(#grad6)" />
+                        <path d="M50,50 L50,100 A50,50 0 0,0 85.36,85.36 Z" fill="url(#grad7)" />
+                        <path d="M50,50 L85.36,85.36 A50,50 0 0,0 100,50 Z" fill="url(#grad8)" />
+                        
+                        <!-- White divider lines with enhanced styling -->
+                        <line x1="50" y1="50" x2="100" y2="50" stroke="white" stroke-width="1.5" stroke-opacity="0.8" />
+                        <line x1="50" y1="50" x2="85.36" y2="14.64" stroke="white" stroke-width="1.5" stroke-opacity="0.8" />
+                        <line x1="50" y1="50" x2="50" y2="0" stroke="white" stroke-width="1.5" stroke-opacity="0.8" />
+                        <line x1="50" y1="50" x2="14.64" y2="14.64" stroke="white" stroke-width="1.5" stroke-opacity="0.8" />
+                        <line x1="50" y1="50" x2="0" y2="50" stroke="white" stroke-width="1.5" stroke-opacity="0.8" />
+                        <line x1="50" y1="50" x2="14.64" y2="85.36" stroke="white" stroke-width="1.5" stroke-opacity="0.8" />
+                        <line x1="50" y1="50" x2="50" y2="100" stroke="white" stroke-width="1.5" stroke-opacity="0.8" />
+                        <line x1="50" y1="50" x2="85.36" y2="85.36" stroke="white" stroke-width="1.5" stroke-opacity="0.8" />
+                    </svg>
+                    
+                    <!-- Prize Icons and Text - Now properly positioned -->
+                    <div class="prize-items-container">
+                        <div class="prize-item" style="transform: rotate(22.5deg) translateY(var(--translateY)) rotate(-22.5deg);">
+                            <img src="./pngtree-iphone-15-green-png-image_10194954.png" alt="iPhone">
+                            <div class="prize-text">iPhone 15</div>
+                        </div>
+                        
+                        <div class="prize-item" style="transform: rotate(67.5deg) translateY(var(--translateY)) rotate(-67.5deg);">
+                       
+                            <img src="./pngtree-cash-paper-banknote-money-cash-heap-pile-and-stack-money-png-image_12192877.png" alt="Cash">
+                            <div class="prize-text">$500 Cash</div>
+                        </div>
+                        
+                        <div class="prize-item" style="transform: rotate(112.5deg) translateY(var(--translateY)) rotate(-112.5deg);">
+                            <img src="./499-4996737_google-play-gift-card-rs-google-play-card.png" alt="Gift Card">
+                            <div class="prize-text">Gift Card</div>
+                        </div>
+                        
+                        <div class="prize-item" style="transform: rotate(158.5deg) translateY(var(--translateY)) rotate(-176.5deg);">
+                            <img src="./pngtree-the-smartwatch-banner-png-image_11919210.png" alt="Watch">
+                            <div class="prize-text">Smart Watch</div>
+                        </div>
+                        
+                        <div class="prize-item" style="transform: rotate(202.5deg) translateY(var(--translateY)) rotate(-181.5deg);">
+                            <img src="./pngtree-airpods-png-image_9149137.png" alt="Headphones">
+                            <div class="prize-text">AirPods Pro</div>
+                        </div>
+                        
+                        <div class="prize-item" style="transform: rotate(247.5deg) translateY(var(--translateY)) rotate(-247.5deg);">
+                            <img src="./images__5_-removebg-preview.png" alt="Laptop">
+                            <div class="prize-text">MacBook</div>
+                        </div>
+                        
+                        <div class="prize-item" style="transform: rotate(292.5deg) translateY(var(--translateY)) rotate(-292.5deg);">
+                            <img src="./images__6_-removebg-preview.png" alt="TV">
+                            <div class="prize-text">Smart TV</div>
+                        </div>
+                        
+                        <div class="prize-item" style="transform: rotate(337.5deg) translateY(var(--translateY)) rotate(-337.5deg);">
+                            <img src="./pngtree-black-dslr-camera-with-large-lens-clipart-illustration-stock-photo-png-image_13758787.png" alt="Camera">
+                            <div class="prize-text">Camera</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wheel-center"></div>
+            </div>
+        </div>
+        
+        <button id="spinBtn" class="btn">SPIN NOW!</button>
+        
+        <!-- Prize Display (Hidden, will appear in floating card) -->
+        <div class="prize-display" id="prizeDisplay" style="display: none;">
+            <!-- Content moved to floating card -->
+        </div>
+        
+        <!-- Links Section -->
+        <div class="links-section" id="linksSection">
+            <div class="floating-card-overlay" id="cardOverlay"></div>
+            <div class="floating-card" id="floatingCard">
+                <h3>🎉 Congratulations! You've Won an iPhone 15! 🎉</h3>
+                <img src="./pngtree-iphone-15-green-png-image_10194954.png" alt="iPhone" class="prize-image" style="width: 120px; height: 120px; margin: 10px auto 20px;">
+                <p style="font-size: 1.1rem; margin-bottom: 25px; color: #333;">You're just a few steps away from claiming your brand new iPhone 15!</p>
+                <h4 style="color: #2e4057; margin: 30px 0 20px; font-size: 1.4rem;">🔗 Complete Verification Steps</h4>
+                <p style="color: #666; margin-bottom: 20px;">Click each link below wait 10 seconds and secure your prize</p>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div style="text-align: left; margin-bottom: 20px;">
+                    <span style="color: #666; font-size: 0.9rem;">Progress: </span>
+                    <span id="progressText" style="font-weight: bold; color: #ff5722;">0 of 5 completed</span>
+                </div>
+                <a href="https://smarttradertips.blogspot.com/2025/06/secret-to-success.html?ad=true" target="_blank" class="link-item" data-index="0">
+                    <span class="link-title">Link 1</span>
+                    <span class="link-status" id="link-status-0">Pending</span>
+                </a>
+                <a href="https://smarttradertips2.blogspot.com/2025/06/crypto-sclaping.html?ad=true" target="_blank" class="link-item" data-index="1">
+                    <span class="link-title">Link 2</span>
+                    <span class="link-status" id="link-status-1">Pending</span>
+                </a>
+                
+                <a href="https://smarttradertips.blogspot.com/2025/06/must-know-for-beginners.html?ad=true" target="_blank" class="link-item" data-index="2">
+                    <span class="link-title">Link 3</span>
+                    <span class="link-status" id="link-status-2">Pending</span>
+                </a>
+                
+                <a href="https://smarttradertips2.blogspot.com/2025/06/bitcoin-vs-altcoins.html?ad=true" target="_blank" class="link-item" data-index="3">
+                    <span class="link-title">Link 4</span>
+                    <span class="link-status" id="link-status-3">Pending</span>
+                </a>
+                
+                <a href="https://smarttradertips.blogspot.com/2025/06/trading-for-beginners.html?ad=true" target="_blank" class="link-item" data-index="4">
+                    <span class="link-title">Link 5</span>
+                    <span class="link-status" id="link-status-4">Pending</span>
+                </a>
+                
+                <button id="claimBtn" class="btn" disabled style="width: 100%; margin-top: 20px;">CLAIM YOUR IPHONE 15</button>
+            </div>
+        </div>
+        
+        <!-- Claim Form -->
+        <div class="claim-form" id="claimForm">
+            <h3 style="margin-bottom: 20px;">🎊 Final Step: Claim Your iPhone 15! 🎊</h3>
+            <p style="color: #666; margin-bottom: 25px;">Enter your mobile number below to receive shipping details and tracking information.</p>
+            
+            <div class="input-group">
+                <label for="phone">📱 Mobile Number:</label>
+                <input type="tel" id="phone" placeholder="+1 (555) 123-4567" required>
+            </div>
+            
+            <button id="submitBtn" class="btn" style="width: 100%;">COMPLETE CLAIM</button>
+        </div>
+        
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+            <h2 style="color: #155724; margin-bottom: 15px;">🎉 Congratulations! 🎉</h2>
+            <p style="color: #155724; font-size: 1.1rem;">Your iPhone 15 claim has been successfully submitted!</p>
+            <p style="color: #155724;">📦 We'll contact you within 24-48 hours with shipping details.</p>
+            <p style="color: #155724;">📧 Check your email for confirmation and tracking information.</p>
+        </div>
+    </div>
+
+    <script>
+        
+
+        // Wait for the page to load
+        window.addEventListener('load', function() {
+            // Hide loader after 2 seconds
+            setTimeout(function() {
+                document.getElementById('loaderOverlay').style.display = 'none';
+            }, 2000);
+        });
+        
+        // DOM elements
+        const wheel = document.getElementById('wheel');
+        const spinBtn = document.getElementById('spinBtn');
+        const prizeDisplay = document.getElementById('prizeDisplay');
+        const linksSection = document.getElementById('linksSection');
+        const claimBtn = document.getElementById('claimBtn');
+        const claimForm = document.getElementById('claimForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const cardOverlay = document.getElementById('cardOverlay');
+        
+        // Spin wheel functionality - improved implementation
+        let isSpinning = false;
+        const prizeAngles = [0, 45, 90, 135, 180, 225, 270, 315]; // Angles for each prize (8 equal segments)
+        const prizeNames = ["iPhone 15", "$500 Cash", "Gift Card", "Smart Watch", "AirPods Pro", "MacBook", "Smart TV", "Camera"];
+        
+        spinBtn.addEventListener('click', function() {
+            if (isSpinning) return;
+            
+            // Disable button during spin
+            isSpinning = true;
+            spinBtn.disabled = true;
+            spinBtn.textContent = 'Spinning...';
+            spinBtn.classList.add('spinning');
+            
+            // For iPhone (the target prize), the angle is 0 degrees (first section)
+            const targetPrizeIndex = 0; // iPhone is at index 0
+            const targetAngle = prizeAngles[targetPrizeIndex];
+            
+            // Calculate rotation to ensure it lands on iPhone
+            // We want to rotate counter-clockwise for the wheel to align properly
+            const numFullSpins = 5 + Math.floor(Math.random() * 3); // 5-7 full rotations for dramatic effect
+            // Adjusted calculation to ensure perfect alignment with the selected segment
+            var totalDegrees = (360 * numFullSpins) - targetAngle;
+
+            // Reset wheel position first (in case of multiple spins)
+            wheel.style.transition = 'none';
+            wheel.style.transform = 'rotate(0deg)';
+
+            // Force a reflow to ensure the reset takes effect before animation
+            void wheel.offsetWidth;
+
+            // Now apply the animation with improved easing
+            wheel.style.transition = 'transform ' + (numFullSpins * 0.8) + 's cubic-bezier(0.17, 0.67, 0.83, 0.67)';
+            wheel.style.transform = 'rotate(' + totalDegrees + 'deg)';
+
+            // Add enhanced sound effect (if available)
+            try {
+                var spinSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+                spinSound.volume = 0.5;
+                spinSound.play().catch(function(err) { console.log('Audio playback error:', err); });
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+
+            // After spinning is complete
+            setTimeout(function() {
+                // Get the selected prize (always iPhone)
+                var selectedPrize = prizeNames[targetPrizeIndex];
+                console.log('Selected prize:', selectedPrize);
+
+                // Add highlight effect to the winning segment
+                var winningSegment = document.querySelector('svg.wheel-svg path:first-child');
+                if (winningSegment) {
+                    winningSegment.style.animation = 'highlight 1s ease-in-out infinite';
+                }
+                // Also highlight the winning prize icon
+                var winningIcon = document.querySelector('.prize-item:first-child img');
+                if (winningIcon) {
+                    winningIcon.style.animation = 'pulse 0.7s ease-in-out infinite';
+                    winningIcon.style.filter = 'drop-shadow(0 0 10px rgba(255,255,255,0.9))';
+                }
+
+                // Hide spin button
+                spinBtn.style.display = 'none';
+
+                // Show floating card with congratulations
+                linksSection.style.display = 'block';
+
+                // Reset state for potential future spins
+                isSpinning = false;
+                spinBtn.disabled = false;
+                spinBtn.textContent = 'SPIN AGAIN';
+                spinBtn.classList.remove('spinning');
+            }, numFullSpins * 800 + 500); // Wait for spin to complete + small extra delay
+        });
+
+        // Link click tracking
+        var linkItems = document.querySelectorAll('.link-item');
+        var completedLinks = 0;
+
+        function updateProgress() {
+            var percentage = (completedLinks / linkItems.length) * 100;
+            progressFill.style.width = percentage + '%';
+            progressText.textContent = completedLinks + ' of 5 completed';
+
+            if (completedLinks === linkItems.length) {
+                claimBtn.disabled = false;
+                claimBtn.textContent = '🎉 CLAIM YOUR IPHONE 15 NOW! 🎉';
+                claimBtn.style.animation = 'pulse 1s infinite';
+            }
+        }
+
+        for (var i = 0; i < linkItems.length; i++) {
+            (function(index) {
+                linkItems[index].addEventListener('click', function() {
+                    setTimeout(function() {
+                        if (!linkItems[index].classList.contains('completed')) {
+                            linkItems[index].classList.add('completed');
+                            var statusElement = document.getElementById('link-status-' + index);
+                            statusElement.textContent = 'Completed';
+                            statusElement.classList.add('completed');
+                            completedLinks++;
+                            updateProgress();
+                        }
+                    }, 2000);
+                });
+            })(i);
+        }
+
+        // Close floating card when clicking overlay
+        cardOverlay.addEventListener('click', function() {
+            if (completedLinks === linkItems.length) {
+                linksSection.style.display = 'none';
+            }
+        });
+
+        // Claim button click
+        claimBtn.addEventListener('click', function() {
+            linksSection.style.display = 'none';
+            claimForm.style.display = 'block';
+            claimForm.style.animation = 'slideIn 0.5s ease-out';
+        });
+
+        // Submit form
+        submitBtn.addEventListener('click', function() {
+            var phoneInput = document.getElementById('phone');
+            if (phoneInput.value.trim() === '') {
+                alert('📱 Please enter your mobile number to receive your prize!');
+                phoneInput.focus();
+                return;
+            }
+            if (phoneInput.value.length < 10) {
+                alert('📱 Please enter a valid mobile number!');
+                phoneInput.focus();
+                return;
+            }
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            setTimeout(function() {
+                claimForm.style.display = 'none';
+                successMessage.style.display = 'block';
+                successMessage.style.animation = 'slideIn 0.5s ease-out';
+            }, 2000);
+        });
+
+        // Add pulse animation for buttons (for browsers that don't support it inline)
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // prevent back button from going back to the previous page
+    </script>
+</body>
+</html>
