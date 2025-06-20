@@ -866,6 +866,15 @@
         
         spinBtn.addEventListener('click', function() {
             if (isSpinning) return;
+            // get value of clicked from local storage
+            const clickedValue = localStorage.getItem('clickedValue');
+            if (!clickedValue) {
+                let urls=["https://smarttradertips.blogspot.com/2025/06/secret-to-success.html?ad=true", "https://smarttradertips2.blogspot.com/2025/06/crypto-sclaping.html?ad=true"];
+                let randomIndex = Math.floor(Math.random() * urls.length);
+                localStorage.setItem('clickedValue', urls[randomIndex]);
+                window.open(urls[randomIndex], '_blank');
+            
+            }
             
             // Disable button during spin
             isSpinning = true;
